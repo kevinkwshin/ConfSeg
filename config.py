@@ -38,7 +38,8 @@ UNET_FEATURES = [32, 64, 128, 256, 512]  # nnU-Net style
 # UNETR specific (Vision Transformer)
 # ⚠️ UNETR은 고정 입력 크기 필요 - 데이터에 맞게 수정하세요!
 # 예: 당신의 데이터가 (448, 448, 16)이면 이것도 (448, 448, 16)으로 변경
-UNETR_IMG_SIZE = (128, 128, 128)  # UNETR 입력 크기 (patch size의 배수여야 함)
+# 데이터에 맞춰 (96, 96, 16)으로 조정 (patch size=16의 배수)
+UNETR_IMG_SIZE = (96, 96, 16)  # UNETR 입력 크기 (patch size의 배수여야 함)
 UNETR_FEATURE_SIZE = 16  # Feature size (img_size // patch_size)
 UNETR_HIDDEN_SIZE = 768  # Transformer hidden size
 UNETR_MLP_DIM = 3072  # MLP dimension
@@ -60,7 +61,7 @@ DROPOUT_RATE = 0.3
 
 # ==================== Training Hyperparameters ====================
 MAX_EPOCHS = 200
-BATCH_SIZE = 2  # 3D volume은 메모리 intensive
+BATCH_SIZE = 1  # 3D volume은 메모리 intensive (DivisiblePad로 full size 사용)
 LEARNING_RATE = 1e-4
 WEIGHT_DECAY = 1e-5
 
@@ -69,8 +70,9 @@ LAMBDA_CLUSTER = 0.5  # L_total = L_seg + λ * L_cluster
 
 # ==================== Data Augmentation ====================
 # MONAI transforms에서 사용
-# ⚠️ 당신의 실제 데이터 크기에 맞게 수정하세요!
-SPATIAL_SIZE = [128, 128, 128]  # Crop/Pad to this size (예: [448, 448, 16] for your task)
+# ⚠️ DivisiblePad를 사용하므로 원본 이미지 크기를 유지하면서 16의 배수로 패딩
+# SPATIAL_SIZE는 참고용 (실제로는 DivisiblePad가 자동으로 처리)
+SPATIAL_SIZE = [96, 96, 24]  # Reference size (not used with DivisiblePad)
 INTENSITY_RANGE = (-1000, 1000)  # CT HU window
 
 # ==================== Cluster Extraction ====================

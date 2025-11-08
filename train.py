@@ -15,7 +15,7 @@ from monai.data import Dataset, DataLoader as MonaiDataLoader
 from monai.transforms import (
     Compose, LoadImaged, EnsureChannelFirstd, Spacingd,
     ScaleIntensityRanged, RandCropByPosNegLabeld, RandFlipd,
-    RandRotate90d, EnsureTyped, ToTensord
+    RandRotate90d, EnsureTyped, ToTensord, DivisiblePadd, SpatialPadd
 )
 from monai.losses import DiceLoss
 from tqdm import tqdm
@@ -83,14 +83,8 @@ def get_transforms(is_train: bool = True):
                 b_max=1.0,
                 clip=True
             ),
-            RandCropByPosNegLabeld(
-                keys=["image", "label"],
-                label_key="label",
-                spatial_size=config.SPATIAL_SIZE,
-                pos=1,
-                neg=1,
-                num_samples=1
-            ),
+            # DivisiblePad: 이미지를 16의 배수로 패딩 (UNet의 4번 downsampling: 2^4=16)
+            DivisiblePadd(keys=["image", "label"], k=16, mode="constant"),
             RandFlipd(keys=["image", "label"], prob=0.5, spatial_axis=0),
             RandFlipd(keys=["image", "label"], prob=0.5, spatial_axis=1),
             RandFlipd(keys=["image", "label"], prob=0.5, spatial_axis=2),
@@ -109,6 +103,8 @@ def get_transforms(is_train: bool = True):
                 b_max=1.0,
                 clip=True
             ),
+            # DivisiblePad: validation에서도 동일하게 적용
+            DivisiblePadd(keys=["image", "label"], k=16, mode="constant"),
             EnsureTyped(keys=["image", "label"])
         ])
 
