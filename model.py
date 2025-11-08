@@ -196,7 +196,7 @@ def create_model() -> CLCS_Model:
         in_channels=config.IN_CHANNELS,
         out_channels=config.OUT_CHANNELS,
         spatial_dims=config.SPATIAL_DIMS,
-        features=config.UNET_FEATURES
+        unet_features=config.UNET_FEATURES
     )
     return model.to(config.DEVICE)
 
